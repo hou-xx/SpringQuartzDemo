@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <!-- quartz配置  动态配置所以我们将 Factory 作为一个service一样的接口 QuartzJobFactory.java-->
+    <!-- 调度工厂 -->
+    <bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+        <property name="triggers">
+            <list>
+                <ref bean="jobDemoTrigger"/>
+            </list>
+        </property>
+    </bean>
+
+    <!-- targetMethod taskExecutor-->
+    <bean id="jobDemoTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean" lazy-init="false">
+        <property name="jobDetail">
+            <bean class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean" lazy-init="false">
+                <property name="targetObject">
+                    <ref bean="jobDemo" />
+                </property>
+                <property name="targetMethod">
+                    <value>execute</value>
+                </property>
+                <!-- 是否同时发生 -->
+                <property name="concurrent" value="false"></property>
+            </bean>
+        </property>
+        <property name="cronExpression">
+            <value>0 */1 * * * ?</value> <!-- 每1分钟时执行一次-->
+        </property>
+    </bean>
+    <bean id="jobDemo" class="com.hxx.job.JobDemo" />
+
+</beans>
